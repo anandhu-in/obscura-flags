@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBSCURA — Leaderboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05070a;
+      --card: #0c1017;
+      --border: #1a2332;
+      --text: #c8d0dc;
+      --muted: #6b7a8f;
+      --red: #ff2a2a;
+      --accent: #e8eef7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .cover {
+      width: 100%;
+      height: 280px;
+      background: url('obscura-banner.jpg') center center / cover no-repeat;
+      position: relative;
+      border-bottom: 1px solid #1a2332;
+    }
+    .cover::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to bottom, rgba(5,7,10,0.1) 0%, rgba(5,7,10,0.75) 100%);
+    }
+
+    .container {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 0 1.2rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .header {
+      text-align: center;
+      margin-top: -60px;
+      margin-bottom: 2rem;
+    }
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.4rem, 7vw, 3.5rem);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      text-shadow: 0 0 25px rgba(255,42,42,0.25), 2px 0 0 rgba(255,42,42,0.3);
+    }
+    .tagline {
+      color: var(--red);
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      margin-top: 0.4rem;
+      text-transform: uppercase;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.6rem 1.8rem;
+      box-shadow: 0 0 40px rgba(0,0,0,0.5);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+    th, td {
+      padding: 0.7rem 0.8rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      color: var(--muted);
+      font-weight: 400;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .rank-1 { color: var(--red); font-weight: 700; }
+
+    .btn {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 0.65rem 1.4rem;
+      border-radius: 3px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.9rem;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 1.5rem;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      background: var(--red);
+      color: #05070a;
+    }
+    .note {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cover"></div>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo">OBSCURA</div>
+      <div class="tagline">LEADERBOARD</div>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Operative</th>
+            <th>Score</th>
+            <th>Last seen</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+          <tr><td colspan="4" style="color:var(--muted)">Loading...</td></tr>
+        </tbody>
+      </table>
+
+      <p class="note">
+        Live shared leaderboard — all players are visible here.
+      </p>
+
+      <a href="index.html" class="btn">← BACK TO SUBMISSION</a>
+    </div>
+  </div>
+
+  <script>
+    async function loadLeaderboard() {
+      try {
+        const res = await fetch('/api/leaderboard');
+        const players = await res.json();
+
+        const tbody = document.getElementById('leaderboard-body');
+
+        if (players.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="4" style="color:var(--muted)">No operatives recorded yet</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = players.map((p, i) => {
+          const rankClass = i === 0 ? 'rank-1' : '';
+          const date = new Date(p.updated).toLocaleString();
+          return `
+            <tr>
+              <td class="${rankClass}">${i + 1}</td>
+              <td>${escapeHtml(p.callsign)}</td>
+              <td>${p.score}/3</td>
+              <td style="color:var(--muted);font-size:0.85rem">${date}</td>
+            </tr>`;
+        }).join('');
+      } catch (err) {
+        document.getElementById('leaderboard-body').innerHTML =
+          `<tr><td colspan="4" style="color:var(--red)">Failed to load leaderboard</td></tr>`;
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    loadLeaderboard();
+    // Auto-refresh every 15 seconds
+    setInterval(loadLeaderboard, 15000);
+  </script>
+</body>
+</html>

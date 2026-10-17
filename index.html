@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBSCURA — Flag Submission</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #05070a;
+      --card: #0c1017;
+      --border: #1a2332;
+      --text: #c8d0dc;
+      --muted: #6b7a8f;
+      --red: #ff2a2a;
+      --red-dim: #b31f1f;
+      --accent: #e8eef7;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Share Tech Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2.5rem 1.2rem;
+      line-height: 1.6;
+      background-image: 
+        radial-gradient(ellipse at 20% 30%, rgba(20, 30, 50, 0.4) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(40, 10, 10, 0.25) 0%, transparent 45%);
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .container { max-width: 740px; margin: 0 auto; position: relative; z-index: 1; }
+    .header { text-align: center; margin-bottom: 2.8rem; }
+    .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.8rem, 8vw, 4.2rem);
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      text-shadow: 0 0 20px rgba(255,42,42,0.15), 2px 0 0 rgba(255,42,42,0.25), -2px 0 0 rgba(100,150,255,0.15);
+    }
+    .tagline {
+      color: var(--red);
+      font-size: 0.95rem;
+      letter-spacing: 0.12em;
+      margin-top: 0.6rem;
+      text-transform: uppercase;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 1.2rem;
+      max-width: 420px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.6rem 1.8rem;
+      margin-bottom: 1.6rem;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    }
+    label {
+      display: block;
+      margin-bottom: 0.45rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      letter-spacing: 0.05em;
+    }
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 3px;
+      border: 1px solid #2a3548;
+      background: #070b11;
+      color: var(--text);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+      margin-bottom: 1.1rem;
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--red-dim);
+      box-shadow: 0 0 0 1px rgba(255,42,42,0.2);
+    }
+    button, .btn {
+      background: transparent;
+      color: var(--red);
+      border: 1px solid var(--red);
+      padding: 0.7rem 1.5rem;
+      border-radius: 3px;
+      font-family: 'Share Tech Mono', monospace;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 0.95rem;
+      letter-spacing: 0.05em;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.2s;
+    }
+    button:hover, .btn:hover {
+      background: var(--red);
+      color: #05070a;
+    }
+    button.secondary, .btn.secondary {
+      border-color: #3a4a60;
+      color: var(--muted);
+      margin-left: 0.6rem;
+    }
+    button.secondary:hover, .btn.secondary:hover {
+      border-color: var(--muted);
+      background: transparent;
+      color: var(--text);
+    }
+    .flag-row {
+      display: flex;
+      gap: 0.9rem;
+      align-items: center;
+      margin-bottom: 0.9rem;
+    }
+    .flag-row input { margin-bottom: 0; flex: 1; }
+    .status { font-size: 0.85rem; min-width: 90px; letter-spacing: 0.04em; }
+    .correct { color: #4ade80; }
+    .wrong { color: var(--red); }
+    .hidden { display: none; }
+    .score-line { font-size: 1.05rem; margin-bottom: 1.1rem; }
+    .score-line strong { color: var(--red); }
+    .note {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 0.8rem;
+      line-height: 1.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="logo">OBSCURA</div>
+      <div class="tagline">NOT EVERYTHING IS MEANT TO BE SEEN.</div>
+      <p class="subtitle">Submit the three layers. Only the observant will rise.</p>
+    </div>
+
+    <!-- Login / Register -->
+    <div class="card" id="login-section">
+      <label for="username">> CALLSIGN</label>
+      <input type="text" id="username" placeholder="enter callsign..." maxlength="20" autocomplete="off" />
+
+      <label for="password">> PASSWORD</label>
+      <input type="password" id="password" placeholder="set or enter password..." autocomplete="off" />
+
+      <button onclick="auth()">INITIATE</button>
+
+      <p class="note">
+        First time? The password you enter will be registered for this callsign.<br>
+        Already registered? Enter the correct password.
+      </p>
+    </div>
+
+    <!-- Main app -->
+    <div id="app" class="hidden">
+      <div class="card">
+        <div class="score-line">
+          Operative: <strong id="current-user"></strong> &nbsp;|&nbsp;
+          Layers recovered: <strong id="score">0</strong> / 3
+        </div>
+        <button class="secondary" onclick="logout()">CHANGE CALLSIGN</button>
+        <a href="leaderboard.html" class="btn secondary">VIEW LEADERBOARD</a>
+      </div>
+
+      <div class="card">
+        <h2 style="font-family:'Orbitron',sans-serif; font-size:1.1rem; letter-spacing:0.1em; margin-bottom:1.3rem; color:var(--accent);">
+          FLAG SUBMISSION
+        </h2>
+
+        <div class="flag-row">
+          <input type="text" id="flag1" placeholder="OBSCURA{...}" />
+          <span class="status" id="status1"></span>
+        </div>
+        <div class="flag-row">
+          <input type="text" id="flag2" placeholder="OBSCURA{...}" />
+          <span class="status" id="status2"></span>
+        </div>
+        <div class="flag-row">
+          <input type="text" id="flag3" placeholder="OBSCURA{...}" />
+          <span class="status" id="status3"></span>
+        </div>
+
+        <button onclick="submitFlags()" style="margin-top:0.8rem">VERIFY LAYERS</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Save credentials in session (cleared when browser tab is closed)
+    let currentCallsign = sessionStorage.getItem('obscura_callsign') || null;
+    let currentPassword = sessionStorage.getItem('obscura_password') || null;
+
+    async function auth() {
+      const callsign = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!callsign || !password) {
+        alert('Callsign and password required.');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ callsign, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || 'Authentication failed');
+          return;
+        }
+
+        // Success
+        currentCallsign = data.callsign;
+        currentPassword = password;
+        sessionStorage.setItem('obscura_callsign', currentCallsign);
+        sessionStorage.setItem('obscura_password', currentPassword);
+
+        document.getElementById('current-user').textContent = currentCallsign;
+        document.getElementById('score').textContent = data.score;
+        showApp();
+      } catch (err) {
+        alert('Server error. Is the backend running?');
+      }
+    }
+
+    function logout() {
+      sessionStorage.removeItem('obscura_callsign');
+      sessionStorage.removeItem('obscura_password');
+      currentCallsign = null;
+      currentPassword = null;
+      document.getElementById('login-section').classList.remove('hidden');
+      document.getElementById('app').classList.add('hidden');
+      document.getElementById('password').value = '';
+    }
+
+    function showApp() {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+    }
+
+    async function submitFlags() {
+      if (!currentCallsign || !currentPassword) {
+        alert('Please login first');
+        return;
+      }
+
+      const flags = [
+        document.getElementById('flag1').value.trim(),
+        document.getElementById('flag2').value.trim(),
+        document.getElementById('flag3').value.trim()
+      ];
+
+      try {
+        const res = await fetch('/api/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            callsign: currentCallsign,
+            password: currentPassword,
+            flags
+          })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || 'Submission failed');
+          return;
+        }
+
+        // Show results
+        for (let i = 0; i < 3; i++) {
+          const statusEl = document.getElementById(`status${i + 1}`);
+          if (flags[i] === '') {
+            statusEl.textContent = '';
+            statusEl.className = 'status';
+          } else if (data.results[i]) {
+            statusEl.textContent = '✓ LAYER OPEN';
+            statusEl.className = 'status correct';
+          } else {
+            statusEl.textContent = '✗ DENIED';
+            statusEl.className = 'status wrong';
+          }
+        }
+
+        document.getElementById('score').textContent = data.score;
+      } catch (err) {
+        alert('Server error');
+      }
+    }
+
+    // Auto-login if already authenticated in this tab
+    if (currentCallsign && currentPassword) {
+      document.getElementById('current-user').textContent = currentCallsign;
+      // We don't know the score yet, so fetch leaderboard or just show 0 until submit
+      document.getElementById('score').textContent = '?';
+      showApp();
+    }
+  </script>
+</body>
+</html>
